@@ -1,53 +1,204 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
-  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
-  <title>List cewe yang keva suka</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Pembayaran</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --sub-text-color: #666666;
+            --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background-color: var(--card-background);
+            border-radius: 16px;
+            box-shadow: var(--shadow-light);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: var(--sub-text-color);
+            margin-top: 0;
+            font-size: 1rem;
+        }
+
+        .payment-options {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .payment-card {
+            display: flex;
+            align-items: center;
+            background-color: var(--background-color);
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            margin-right: 15px;
+            object-fit: contain;
+        }
+
+        .payment-info {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .payment-info h3 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .payment-info p {
+            font-size: 0.9rem;
+            margin: 0;
+            color: var(--sub-text-color);
+        }
+
+        .copy-button {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .copy-button:active {
+            transform: scale(0.95);
+        }
+
+        .thank-you {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: var(--sub-text-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 500px) {
+            .payment-container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px;
+            }
+
+            .payment-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px;
+                gap: 10px;
+            }
+            
+            .payment-info {
+                text-align: center;
+            }
+            
+            .copy-button {
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>
-    List cewe yang keva suka
-  </h1>
-  <h2>terdiri dari beberapa orang di bawah ini</h2>
-  <table border="1">
-    <thead>
-      <th>no</th>
-      <th>nama</th>
-      <th>kelas</th>
-    </thead>
-    
-    <tbody>
-      <tr>
-      <td>1</td>
-      <td>adel</td>
-      <td>8B</td>
-      </tr>
-      
-      <tr>
-        <td>2</td>
-        <td>siska</td>
-        <td>8C</td>
-      </tr>
-      
-      <tr>
-        <td>3</td>
-        <td>mercy</td>
-        <td>8A</td>
-      </tr>
-      
-      <tr>
-        <td>4</td>
-        <td>silvi</td>
-        <td>8A</td>
-      </tr>
-      
-      <tr>
-        <td>5</td>
-        <td>chery</td>
-        <td>8B</td>
-      </tr>
-      
-    </tbody>
+
+<div class="payment-container">
+    <div class="header">
+        <h1>Pilih Metode Pembayaran</h1>
+        <p>Silakan lakukan pembayaran ke salah satu nomor di bawah ini.</p>
+    </div>
+
+    <div class="payment-options">
+        
+        <div class="payment-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_DANA_Indonesia.svg/1200px-Logo_DANA_Indonesia.svg.png" alt="Logo DANA" class="logo">
+            <div class="payment-info">
+                <h3>DANA</h3>
+                <p>No. 081295081562</p>
+            </div>
+            <button class="copy-button" onclick="copyToClipboard('081295081562')">Salin</button>
+        </div>
+
+        <div class="payment-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/GoPay.svg" alt="Logo GoPay" class="logo">
+            <div class="payment-info">
+                <h3>GoPay</h3>
+                <p>No. 081295081562</p>
+            </div>
+            <button class="copy-button" onclick="copyToClipboard('081295081562')">Salin</button>
+        </div>
+
+    </div>
+
+    <p class="thank-you">Terima kasih atas pembelian Anda!</p>
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Nomor berhasil disalin: ' + text);
+        }).catch(err => {
+            console.error('Gagal menyalin: ', err);
+        });
+    }
+</script>
+
 </body>
-</html>
+  </html>
+  
